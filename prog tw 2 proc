@@ -1,0 +1,52 @@
+1. Napisz program tworzący dwa procesy. Każdy ze stworzonych procesów powinien utworzyć proces - potomka. Należy wyświetlać identyfikatory procesów rodziców i potomków po każdym wywołaniu funkcji fork.
+2. Napisz program którego rezultatem będzie wydruk zawartości bieżącego katalogu poprzedzony napisem „Poczatek" a zakończony napisem „Koniec"
+(C)
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+1----------------
+int main(){
+    printf("Poczatek\n");
+    printf("ID: %d\n", getpid());
+    int f1 = fork();
+    if(f1==0) {
+        printf("Potomek f1 ID: %d PPID %d\n", getpid(), getppid());
+        int f11 = fork ();
+            if(f11==0){
+            printf("Potomek f11 ID: %d PPID: %d\n",  getpid(), getppid());
+        exit(0);
+        }
+        exit(0);
+    }
+
+    int f2 = fork();
+    if(f2==0) {
+        printf("Potomek f2 ID: %d PPID %d\n", getpid(), getppid());
+        int f22 = fork ();
+            if(f22==0){
+            printf("Potomek f22 ID: %d PPID: %d\n",  getpid(), getppid());
+    exit(0);
+    }
+
+    exit(0);
+    }
+printf("Koniec\n");
+
+return 0;
+
+#include<sys/wait.h>
+2------------
+int main(){
+	printf("Poczatek\n");
+	if (fork() == 0){
+		execlp("ls", "ls", "-a", NULL);
+	}
+	wait(NULL);
+	printf("Koniec\n");
+}
+
+
+
+
+}
