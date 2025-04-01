@@ -1,0 +1,19 @@
+Napisz skrypt przyjmujący trzy parametry:
+-Nazwę pliku
+-Nazwa czynności - usunięcie, utworzenie, kopiowanie
+-(Opcjonalny) nazwa pliku
+	Dodatkowo napisany skrypt musi być uzależniony od zmiennej środowiskowej. Przykładowo niech pod tą zmienną będzie ścieżka do pliku który zależnie od środowiska będzie inny.
+	Działanie skryptu:
+	1. Usuwanie - usuwa plik z pierwszego parametru
+	2. Tworzenie - tworzy nowy plik i dodaje zawartość z pliku który jest pod zmienną
+	3. Kopiowanie - kopiuje zawartość z trzeciego parametru do pliku z pierwszego parametru
+
+#!/bin/bash
+if [ $2 = "-remove" ] ; then
+	rm $1;
+elif [ $2 = "-create" ] ; then 
+	touch $DEPENDENT/$1;
+	cat $ZMIENNA > $1;
+elif [ $2 = "-copy" ] ; then
+	cp $3 $1;
+fi
