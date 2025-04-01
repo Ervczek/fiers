@@ -36,7 +36,7 @@ printf("Koniec\n");
 return 0;
 
 #include<sys/wait.h>
-2------------
+2-------------------------------
 int main(){
 	printf("Poczatek\n");
 	if (fork() == 0){
@@ -45,8 +45,43 @@ int main(){
 	wait(NULL);
 	printf("Koniec\n");
 }
-
-
-
-
 }
+
+
+
+3.Napisz program który utworzy dowolny plik o dowolnej nazwie (jeśli już taki istnieje, program powinien go otworzyć w trybie „dopisywania”). Program powinien dopisywać losowo wygenerowane ciągi znaków - liczba słów powinna być uzależniona od
+zmiennej środowiskowej, jak również maksymalna liczba znaków). W programie powinny także powstać dwa osobne procesy które zrobią dokładnie to samo, co główny proces.
+
+3-------------------------------
+
+int main() {
+    srand(getpid());
+
+    // Pobranie wartości zmiennych środowiskowych
+    char *env_num_words = getenv("NUM_WORDS");
+    char *env_max_chars = getenv("MAX_CHARS");
+    int num_words = env_num_words ? atoi(env_num_words) : DEFAULT_WORDS;
+    int max_chars = env_max_chars ? atoi(env_max_chars) : DEFAULT_MAX_CHARS;
+    
+    // Główny proces zapisuje do pliku
+    write_random_text(FILE_NAME, num_words, max_chars);
+    
+    // Tworzenie dwóch procesów potomnych
+    for (int i = 0; i < 2; i++) {
+        pid_t pid = fork();
+        if (pid == 0) { // Kod dla procesu potomnego
+            write_random_text(FILE_NAME, num_words, max_chars);
+            exit(EXIT_SUCCESS);
+        } else if (pid < 0) {
+            perror("Błąd podczas tworzenia procesu potomnego");
+            exit(EXIT_FAILURE);
+        }
+    }
+    
+    // Oczekiwanie na zakończenie procesów potomnych
+    wait(NULL);
+    wait(NULL);
+    
+    return 0;
+}
+
