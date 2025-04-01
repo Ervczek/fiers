@@ -1,0 +1,67 @@
+Stwórz plik, w programie C dodaj jakiś ciąg znaków do tego pliku.
+Jako rozszerzenie poprzedniego zadania program powinien przyjmować nazwę pliku. Program powinien sprawdzić czy plik istnieje (jeśli nie, rzucić odpowiednim błędem) i zapisać jakąś zawartość do niego. Jeśli plik istnieje to zawartość powinna być dopisywana,
+a nie nadpisywana.
+Kolejnym rozszerzeniem jest sprawdzenie jaką długość ma zawartość pliku. Jeśli powyżej 10 znaków, dopisujemy nową zawartość, jeśli nie, pomijamy.
+ 
+Po rozwiązaniu zadań pora na następne:
+Teraz, gdy plik nie istnieję należy stworzyć dany plik. Zawartością tego pliku mają być wygenerowane pseudolosowo liczby ( maksymalna ilość tych liczb powinna być brana ze zmiennej środowiskowej - getenv).
+Na koniec program powinien podać ilość wygenerowanych liczb - ale tylko przez czytanie zawartości pliku!
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main()
+{
+    srand( time( NULL ) );
+    FILE *fptr;
+    char name[80];
+    scanf("%79s", name);
+    fptr = (fopen(name, "w"));
+    int count = 0;
+    if(fptr == NULL)
+    {
+        printf("Plik nie istnieje");
+    }
+    else
+    {
+        fclose(fptr);
+
+        fptr = (fopen(name, "a"));
+        if(fptr == NULL)
+        {
+            printf("Plik nie istnieje");
+        }
+        else
+        {
+            char * environ = getenv("GLOBAL_VARIABLE");
+            int v = atoi(environ);
+            for (int i=0; i<v; i++)
+            {
+                int x = (rand() % 100) + 1;
+                fprintf(fptr, "%d\n", x);
+            }
+            char ch;
+            fclose(fptr);
+
+            fptr = (fopen(name, "r"));
+            while ((ch = fgetc(fptr)) != EOF)
+            {
+                count++;
+            }
+
+            if(count > 10)
+            {
+                printf("%d", count);
+                fprintf(fptr, "hello");
+            }
+            else
+            {
+                printf("plik ma %d znaków", count);
+            }
+        }
+        fclose(fptr);
+    }
+
+    return 0;
+}
