@@ -1,0 +1,39 @@
+1. Utwórz katalog kat1/ kat2/ kat3/
+2. W Kat1 utwórz katalogi subkat1_1/ subkat1_2/
+3. W Kat2 utwórz katalogi subkat2_1/ subkat2_2/
+4. W Kat1/subkat1_1 utwórz skrypt wyświetlający jakąś wiadomość na standardowe wyjście
+5. Przekopiuj skrypt do Kat1/subkat1_2
+6. Zmodyfikuj skrypt tak, żeby utworzył katalogi subkat3_1/ subkat3_2/ w kat3/
+7. W kat3/subkat3_1/ utwórz plik zawierający liczbę słów, znaków z poprzedniego skryptu
+8. Znaleźć poprzedni plik za pomocą jakieś funkcji szukającej, uzyć funkcji wyświetlającej i zapisać ciało pliku do nowego w kat3/subkat3_2 - oczywiście wszystko zapisane w jednolinijkowej komendzie
+9. Stworzyć skrypt który będzie wpadał w nieskończoną pętlę (skrypt bash i skrypt w c). W nowym oknie terminala, za pomocą jednej linijki znaleźć proces wykonujący ten program i go zneutralizować.
+10. Za pomocą cron stworzyć taska który będzie uruchamiał skrypt z Kat1/subkat1_2 w jakimś interwale czasowym np. o minutę.
+11. Utworzyć proces (za pomocą bash -c), który będzie działał w tle.
+--------------------------------------------------------------------------------------------------
+1/2/3. mkdir -p kat1/subkat1_1 kat1/subkat1_2 kat2/subkat2_1 kat2/subkat2_2 kat3
+
+4. echo -e '#!/bin/bash\necho "Witaj w skrypcie!"' > kat1/subkat1_1/script.sh
+chmod +x kat1/subkat1_1/script.sh
+
+5. cp kat1/subkat1_1/script.sh kat1/subkat1_2/
+
+6. echo -e '#!/bin/bash\necho "Witaj w skrypcie!"\nmkdir -p kat3/subkat3_1 kat3/subkat3_2' > kat1/subkat1_2/script.sh
+chmod +x kat1/subkat1_2/script.sh
+
+7. bash kat1/subkat1_2/script.sh | wc > kat3/subkat3_1/stats.txt
+
+8. find kat3 -name stats.txt -exec cat {} \; > kat3/subkat3_2/copy_stats.txt
+
+9. echo -e '#!/bin/bash\nwhile true; do :; done' > loop.sh
+chmod +x loop.sh (BASH)
+./loop.sh & // uruchomienie
+
+echo -e '#include <stdio.h>\nint main() { while(1); return 0; }' > loop.c
+gcc loop.c -o loop && ./loop & (C)
+
+kill $(pgrep -f loop)
+
+10. (crontab -l 2>/dev/null; echo "* * * * * $(pwd)/kat1/subkat1_2/script.sh") | crontab -
+
+11. bash -c 'while true; do echo "Proces w tle"; sleep 10; done' &
+
