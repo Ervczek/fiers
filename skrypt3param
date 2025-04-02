@@ -8,7 +8,8 @@ Napisz skrypt przyjmujący trzy parametry:
 	2. Tworzenie - tworzy nowy plik i dodaje zawartość z pliku który jest pod zmienną
 	3. Kopiowanie - kopiuje zawartość z trzeciego parametru do pliku z pierwszego parametru
 
-#!/bin/bash
+
+#!/bin/bash                                                           
 if [ $2 = "-remove" ] ; then
 	rm $1;
 elif [ $2 = "-create" ] ; then 
@@ -16,4 +17,19 @@ elif [ $2 = "-create" ] ; then
 	cat $ZMIENNA > $1;
 elif [ $2 = "-copy" ] ; then
 	cp $3 $1;
+fi
+
+Pod zmienną środowiskową umieszczamy ścieżkę do skryptu (skrypt może robić cokolwiek, ważne żeby było widać że jest to wynik działania tego skryptu).
+Pierwszym argumentem jest nazwa nowego pliku (skryptu), drugim opcja - run-copy.
+Zadanie polega na uruchamianiu skryptu którego nazwę przekazujemy jako pierwszą. Kopiowanie polega na skopiowaniu skryptu ze zmiennej plus dodaniu dodatkowej zawartości.
+Na koniec odpalamy skrypt ze zmiennej, żeby pokazać poprawne działanie
+
+#!/bin/bash
+if [ $2 = "-remove" ] ; then
+	rm -rf $1
+elif [ $2 = "-create" ] ; then 
+	touch $1
+elif [ $2 = "-copy" ] ; then
+			
+	cp $(pwd)/$1 $FILE_PATH
 fi
