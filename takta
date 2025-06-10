@@ -1,0 +1,134 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <thread>
+
+void generate_and_sort() {
+    int numbers[10];
+    srand(time(0));
+    for (int i = 0; i < 10; ++i) {
+        numbers[i] = rand() % 101;
+    }
+
+    for (int i = 0; i < 9; ++i) {
+        int minIndex = i;
+        for (int j = i + 1; j < 10; ++j) {
+            if (numbers[j] < numbers[minIndex]) {
+                minIndex = j;
+            }
+        }
+        int temp = numbers[i];
+        numbers[i] = numbers[minIndex];
+        numbers[minIndex] = temp;
+    }
+    cout << "ciag: ";
+    for (int i = 0; i < 10; ++i) {
+       cout << numbers[i] << " ";
+    }
+    cout << endl;
+}
+
+int main() {
+    std::thread t(generate_and_sort);
+    t.join();
+    return 0;
+}
+
+-------------------------
+
+
+#include <iostream>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <unistd.h>
+#include <cstring>
+
+struct msgbuf {
+    long mtype;
+    char mtext[20];
+};
+
+int main() {
+    key_t key = ftok("progfile", 65);
+    int msgid = msgget(key, 0666 | IPC_CREAT);
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        msgbuf msg;
+        while (true) {
+            msgrcv(msgid, &msg, sizeof(msg.mtext), 1, 0);
+            cout << "Odebrano: " << msg.mtext << endl;
+            sleep(1);
+        }
+    } else {
+        msgbuf msg;
+        msg.mtype = 1;
+        const char* texts[2] = {"zalicz", "kolosa"};
+        int i = 0;
+        while (true) {
+            strncpy(msg.mtext, texts[i % 2], sizeof(msg.mtext));
+            msg.mtext[sizeof(msg.mtext) - 1] = '\0';
+            msgsnd(msgid, &msg, sizeof(msg.mtext), 0);
+            cout << "Wysłano: " << msg.mtext << endl;
+            i++;
+            sleep(1);
+        }
+    }
+    return 0;
+}
+
+----------------
+
+touch Dockerfile
+
+FROM python:3.9
+
+ENV TESTSCORE=1
+
+WORKDIR /app
+
+# COPY . .
+
+# CMD ["python", "app.py"]
+
+----------------
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:12.11
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    networks:
+      mynet:
+        ipv4_address: 172.20.0.2
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build:
+      context: .  
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      mynet:
+        ipv4_address: 172.20.0.3
+    environment:
+      DB_HOST: 172.20.0.2
+      DB_USER: user
+      DB_PASS: password
+
+networks:
+  mynet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
