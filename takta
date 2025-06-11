@@ -41,23 +41,30 @@ int main() {
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <unistd.h>
-#include <cstring>
 
 struct msgbuf {
     long mtype;
     char mtext[20];
 };
 
+void copy_text(char* dest, const char* src, int size) {
+    int i = 0;
+    while (i < size - 1 && src[i] != '\0') {
+        dest[i] = src[i];
+        ++i;
+    }
+    dest[i] = '\0';
+}
+
 int main() {
     key_t key = ftok("progfile", 65);
     int msgid = msgget(key, 0666 | IPC_CREAT);
-
     pid_t pid = fork();
     if (pid == 0) {
         msgbuf msg;
         while (true) {
             msgrcv(msgid, &msg, sizeof(msg.mtext), 1, 0);
-            cout << "Odebrano: " << msg.mtext << endl;
+            std::cout << "Odebrano: " << msg.mtext << std::endl;
             sleep(1);
         }
     } else {
@@ -66,14 +73,14 @@ int main() {
         const char* texts[2] = {"zalicz", "kolosa"};
         int i = 0;
         while (true) {
-            strncpy(msg.mtext, texts[i % 2], sizeof(msg.mtext));
-            msg.mtext[sizeof(msg.mtext) - 1] = '\0';
+            copy_text(msg.mtext, texts[i % 2], sizeof(msg.mtext));
             msgsnd(msgid, &msg, sizeof(msg.mtext), 0);
-            cout << "Wysłano: " << msg.mtext << endl;
-            i++;
+            std::cout << "Wysłano: " << msg.mtext << std::endl;
+            ++i;
             sleep(1);
         }
     }
+
     return 0;
 }
 
